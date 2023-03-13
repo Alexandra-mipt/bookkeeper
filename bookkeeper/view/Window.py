@@ -77,7 +77,7 @@ class BookkeeperWindow(QtWidgets.QWidget):
 
         # Дополнительно создадим поле для картиночки
         self.PicField1 = QtWidgets.QLabel()
-        self.pixmap1 = QtGui.QPixmap('Money.jpg')
+       # self.pixmap1 = QtGui.QPixmap('Money.jpg')
        # print(self.pixmap1.isNull())
        # self.PicField1.setPixmap(self.pixmap1)
         self.PicField1.setScaledContents(True)
