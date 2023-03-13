@@ -31,8 +31,6 @@ class Expense:
                f' exp_date = {self.expense_date}; ' \
                f'add_date = {self.added_date}; comm = {self.comment};'
 
-    # Напишем процедуру сравнения двух элементов класса, так как иначе сравнение идёт
-    # по адресу в памяти
     def __eq__(self, check: Any) -> bool:
         # Проверим, что совпадают типы
         if not isinstance(check, Expense):

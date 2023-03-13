@@ -12,9 +12,8 @@ from bookkeeper.view.ExpAddCompany import ExpAddCompany
 from bookkeeper.models.category import Category
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Start_pic_path = os.path.join(BASE_DIR, 'Money.jpg')
 
-# Создаём класс окна, в котором опишем основную начинку
+# Содержание окон
 
 
 class BookkeeperWindow(QtWidgets.QWidget):
@@ -29,8 +28,7 @@ class BookkeeperWindow(QtWidgets.QWidget):
                  category_deleter=None,
                  budget_updater=None,
                  *args, **kwargs):
-        # Так как переопределяем init, то сначала
-        # надо передать все системные аргументы туда, где они нужны
+        # передаем все системные аргументы
         super().__init__(*args, **kwargs)
 
         # Опишем элементы окна сверху вниз, слева-направо
@@ -54,7 +52,6 @@ class BookkeeperWindow(QtWidgets.QWidget):
         self.ExpenseAndCategoryEdit = ExpAddCompany(ctg, expenses_adder, category_adder,
                                                     category_updater, category_deleter)
 
-        # Строим раскладку:
         # Имя таблицы и поле для удаления соберём вместе
         horiz0 = QtWidgets.QHBoxLayout()
         # Подпись таблицы
@@ -77,9 +74,6 @@ class BookkeeperWindow(QtWidgets.QWidget):
 
         # Дополнительно создадим поле для картиночки
         self.PicField1 = QtWidgets.QLabel()
-       # self.pixmap1 = QtGui.QPixmap('Money.jpg')
-       # print(self.pixmap1.isNull())
-       # self.PicField1.setPixmap(self.pixmap1)
         self.PicField1.setScaledContents(True)
         self.PicField1.setMaximumWidth(350)
         self.PicField1.setMaximumHeight(300)
@@ -98,7 +92,6 @@ class BookkeeperWindow(QtWidgets.QWidget):
         hor.addLayout(vert1)
         hor.addWidget(self.PicField2)
 
-        # Присвоим полученную раскладку соотв полю self
         self.layout = hor
         # Применим эту раскладку к окну
         self.setLayout(self.layout)
@@ -127,7 +120,6 @@ class BookkeeperWindow(QtWidgets.QWidget):
         Button_obj = QtWidgets.QPushButton(text)
         return Button_obj
 
-    # Обработка события начала изменения текста - ожидаем обработки окончания ввода
     def text_is_changing(self):
         """Function text is text is changing"""
         # подключаем после окончания обработки редактирования - обработку результата
@@ -138,13 +130,11 @@ class BookkeeperWindow(QtWidgets.QWidget):
         """Function text is get amount"""
         # Отключили отслеживание редактирования
         self.editingFinished.disconnect()
-        # Получили введённый текст
         amount = self.displayText()
         # Проверили, что число
         try:
             amount = float(amount)
         except amount.DoesNotExist:
-            raise ValueError('Некорректный ввод!')
-        # Очистили поле редактирования
+            raise ValueError('Некорректный ввод')
         self.clear()
         print(str(amount))

@@ -10,11 +10,6 @@ from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 def ecran(value: str | Any) -> str | Any:
     """Function ecran"""
-    # SQLite для запросов требует, чтобы у строк были одинарные кавычки
-    # но просто так их не передать, поэтому их ЭКРАНируем: \' .
-    # Для унификации через экран прогоняются все числа.
-    # Те, которые требуют экранирования, его получают.
-    # Которые не требуют - возвращаются.
     if isinstance(value, str):
         return f'\'{value}\''
     return value
@@ -43,47 +38,31 @@ class SQLiteRepository(AbstractRepository[T]):
                         f'(idx INTEGER PRIMARY KEY, {names})')
             con.commit()
 
-    # sqlite возвращает запросы в виде листа кортежей.
-    # Т.е. одна строка - один кортеж.
-    # Но на вход подаются данные в виде какого-то класса.
-    # Чтобы вход и выход можно было сверять, необходимо
-    # Оформлять возврат в виде того же класса.
-    # Для этого и служит следующая функция
     def obertka(self, objbad: Any) -> list[type] | None:
         """Function obertka"""
-        # Если только одна запись - вернём всё равно list из одного объекта
         if len(objbad) == 0:
             return None
         elif len(objbad) == 1:
             objbad = objbad[0]
-            # Создаём пустой объект нужного класса
             objgood = self.ini_class_type()
             # Достаём имена всех кусочков класса
             temp_name = get_annotations(self.ini_class_type, eval_str=True)
             names = tuple(temp_name.keys())
-            # Оборачиваем всё из вывода sql в старый класс
-            # -1, так как среди имён в конце есть pk
             for j in range(len(names)-1):
                 setattr(objgood, names[j], objbad[j+1])
                 setattr(objgood, 'pk', objbad[0])
             print(f'Сформирован: {str(objgood)}')
             return [objgood]
         else:
-            # Достаём имена всех кусочков класса
             temp_name = get_annotations(self.ini_class_type, eval_str=True)
             names = tuple(temp_name.keys())
-            # Заранее создаём список вывода
             arr: list[type] = []
             for k in range(len(objbad)):
-                # Выделили из списка кортеж
                 objbad_temp = objbad[k]
-                # Создаём пустой объект нужного класса
                 objgood = self.ini_class_type()
-                # Оборачиваем всё из вывода sql в старый класс
                 for j in range(len(names) - 1):
                     setattr(objgood, names[j], objbad_temp[j + 1])
                 setattr(objgood, 'pk', objbad_temp[0])
-                # Добавляем результат в список вывода
                 arr = arr + [objgood]
             print(f'Сформированы: {str(arr)}')
             return arr
@@ -106,18 +85,11 @@ class SQLiteRepository(AbstractRepository[T]):
         return obj.pk
 
     def get(self, pk: int) -> T | None:
-        # Открыли базу данных как con
         with sqlite3.connect(self.db_file) as con:
-            # Что-то сделали с базой данных, чтобы из этого
-            # чего-то работать с БД
             cur = con.cursor()
-            # неизвестная штука
             cur.execute('PRAGMA foreign_keys = ON')
-            # Передаём запрос в SQL формате на выдачу всех пунктов записи
-            # из иаблицы table_name по условию, что ключ есть pk
             print(f'SELECT * FROM {self.table_name} WHERE (idx = {pk})')
             cur.execute(f'SELECT * FROM {self.table_name} WHERE (idx = {pk})')
-            # Вытягиваем полученный ответ в объект
             obj = cur.fetchall()
             # Закрываем БД
             con.commit()
@@ -133,46 +105,27 @@ class SQLiteRepository(AbstractRepository[T]):
 
         # Если условие не задано, то вернуть должны всё
         if where is None:
-            # Открываем БД
             with sqlite3.connect(self.db_file) as con:
-                # Что-то сделали с базой данных, чтобы из этого
-                # чего-то работать с БД
                 cur = con.cursor()
-                # Нечто
                 cur.execute('PRAGMA foreign_keys = ON')
-                # Передаём запрос в SQL формате на выдачу всех пунктов записи
-                # из иаблицы table_name по условию, что столбцы names_of_columns
-                # удовлетворяют значениям из values
                 print(f'SELECT * FROM {self.table_name}')
                 cur.execute(f'SELECT * FROM {self.table_name}')
-                # Вытягиваем полученный ответ в объект
                 obj = cur.fetchall()
                 con.commit()
 
-        # Если условие задано, то вернуть должны по условию
         else:
             # Вытащим имена колонок, по которым идёт сортировка
             names_of_columns = where.keys()
-            # Формируем значения условий
             conditions = [f'{name} {where.get(name)}' for name in names_of_columns]
             conditions = tuple(conditions)
-            # Теперь надо соорудить часть запроса, так как нельзя параметризацией
-            # передавать имя таблицы и её столбцов.
-            # условие задаётся в форме словаря, то не
-            # подразумевает записи в услвовие свойства OR или AND.
-            # Поэтому объединяем по принципу AND
             temp_cond = ' AND '.join(conditions)
 
             # Открываем БД
             with sqlite3.connect(self.db_file) as con:
                 cur = con.cursor()
                 cur.execute('PRAGMA foreign_keys = ON')
-                # Передаём запрос в SQL формате на выдачу всех пунктов записи
-                # из таблицы table_name по условию, что столбцы names_of_columns
-                # удовлетворяют значениям из values
                 print(f'SELECT * FROM {self.table_name} WHERE ({temp_cond})')
                 cur.execute(f'SELECT * FROM {self.table_name} WHERE ({temp_cond})')
-                # Вытягиваем полученный ответ в объект
                 obj = cur.fetchall()
                 con.commit()
 
@@ -181,9 +134,7 @@ class SQLiteRepository(AbstractRepository[T]):
 
     def update(self, obj: T) -> None:
         """ Обновить данные об объекте. Объект должен содержать поле pk. """
-        # Вытащили, какой именно объект обновляем
         pk = obj.pk
-        # Проверили, что объект есть
         if self.get(pk) is None:
             raise ValueError(f'No object with idx = {obj.pk} in DB.')
 
@@ -192,15 +143,12 @@ class SQLiteRepository(AbstractRepository[T]):
         values = [getattr(obj, x) for x in self.fields]
         update_data = [f'{names[j]} = ?' for j in range(len(self.fields))]
         update_data = tuple(update_data)
-        # соорудим часть запроса, так как нельзя параметризацией
+        # соорудим часть запроса
         update_zapros = ', '.join(update_data)
 
-        # Открыли базу данных как con
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')
-            # Передаём запрос в SQL формате на UPDATE всех строк
-            # с ключом pk
             print(f'UPDATE {self.table_name} '
                   f'SET {update_zapros} WHERE (idx = {pk})', values)
             cur.execute(f'UPDATE {self.table_name} '
@@ -213,7 +161,6 @@ class SQLiteRepository(AbstractRepository[T]):
         if self.get(pk) is None:
             raise KeyError(f'No object with idx = {pk} in DB.')
 
-        # Открыли базу данных как con
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')

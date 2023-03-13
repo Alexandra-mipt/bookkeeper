@@ -116,16 +116,14 @@ class Category:
             created[child] = cat
         return list(created.values())
 
-    # Оформим красивый вывод для отладки
+    # Вывод для отладки
     def __str__(self) -> str:
         """Function str"""
         return f'pk = {self.pk}; name = {self.name}; parent = {self.parent};'
 
-    # Напишем процедуру сравнения двух элементов класса, так как иначе сравнение идёт
-    # по адресу в памяти или ещё чему-то не тому
     def __eq__(self, check: Any) -> bool:
         """Function eq"""
-        # Проверим сначала, что совпадают типы
+        # Проверим совпадение типов
         if not isinstance(check, Category):
             return NotImplemented
 

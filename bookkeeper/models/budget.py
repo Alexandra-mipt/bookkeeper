@@ -34,7 +34,6 @@ class Budget:
 
         # Текущая дата в коротком формате
         date_short = datetime.now().isoformat()[:10]  # YYYY-MM-DD
-        # Рассмотрим три сорта обновления: за день, за неделю, за месяц
         # За день
         if self.time == 'День':
             # Вытащим траты за день
@@ -42,26 +41,19 @@ class Budget:
                 'expense_date': f'LIKE \'{date_short}%\''})
         elif self.time == 'Неделя':
             # За неделю
-            # Определим текущий день недели
             weekday_now = datetime.now().weekday()
-            # Определим текущую дату в удобном для работы формате
             day_now = datetime.fromisoformat(date_short)
-            # Определеим дату первого дня недели
             first_week_day = day_now - timedelta(days=weekday_now)
-            # Создадим лист для объектов трат
             expenses_in_time = []
             # Прогоним по всем дням недели
             for j in range(7):
-                # Рассматриваемый день недели
                 weekday = first_week_day + timedelta(days=j)
-                # Вытащим траты за день и добавим к остальным
                 day_expenses = expenses_repo.get_all(where={
                     'expense_date': f'LIKE \'{weekday.isoformat()[:10]}%\''})
                 if day_expenses is not None:
                     expenses_in_time = expenses_in_time + day_expenses
 
         elif self.time == 'Месяц':
-            # Вытащим траты за месяц
             expenses_in_time = expenses_repo.get_all(where={
                 'expense_date': f'LIKE \'{date_short[:7]}%\''})
 

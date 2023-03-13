@@ -4,9 +4,6 @@ tables
 from typing import Any
 from PyQt6 import QtWidgets
 
-# Создаём класс таблицы отличается тем, что все данные о настройке таблицы вытащим в отдельное
-# место, а потом воткнём в приложение.
-
 
 class BudgetTable(QtWidgets.QTableWidget):
     """Class representing a Budget Table"""
@@ -40,6 +37,5 @@ class BudgetTable(QtWidgets.QTableWidget):
             for k, x in enumerate(row):
                 self.setItem(j, k, QtWidgets.QTableWidgetItem(x))
 
-        # Делаем красивый вид, настраивая размеры полей
         for j in range(self.columnCount()):
             self.resizeColumnToContents(j)

@@ -98,9 +98,8 @@ class View:
         # Вступительное оповещение
         dlg = QtWidgets.QMessageBox(self.main_window)
         dlg.setWindowTitle('Пользовательское соглашение')
-        dlg.setText('Для продолжения работы с приложением Вы должны \n'
-                    'принять пользовательское соглашение, по которому \n'
-                    'обязуетесь вводить в приложение только корректные данные')
+        dlg.setText('Примите пользовательское соглашение, по которому обязуетесь  \n'
+                    'вводить в приложение только правду, иначе до следующего раза!')
         dlg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes |
                                QtWidgets.QMessageBox.StandardButton.No)
         button = dlg.exec()
@@ -111,8 +110,6 @@ class View:
         print(f'Application ends with exit status {self.app.exec()}')
         sys.exit()
 
-    # Определяем окно, где можно настраивать категории.
-    # Это окно запустится в самом начале, чтобы мы могли его заполнить
     def config_ctg_edit(self):
         """Function config_ctg_edit"""
         self.ctg_edit_window = CategoryAUDWindow(self.add_category,
@@ -192,7 +189,7 @@ class View:
         """Function delete_expenses"""
         dlg = QtWidgets.QMessageBox(self.main_window)
         dlg.setWindowTitle('Удаление')
-        dlg.setText('Удалить выбранный расход?')
+        dlg.setText('Удалить расход?')
         dlg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes |
                                QtWidgets.QMessageBox.StandardButton.No)
         dlg.setIcon(QtWidgets.QMessageBox.Icon.Question)
