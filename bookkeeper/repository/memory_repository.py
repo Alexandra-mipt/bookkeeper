@@ -4,7 +4,6 @@
 
 from itertools import count
 from typing import Any
-
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
